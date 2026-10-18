@@ -1,0 +1,754 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Elements of Accounting | Problem Solvers, Inc.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#002D74; --navy-dk:#001A45; --gold:#FFC629; --gold-lt:#FFF4D1;
+  --ink:#1E2430; --muted:#5A6272; --line:#D5DBE6; --bg:#F4F6FA; --card:#FFFFFF;
+  --blue-lt:#E8EEF8; --ok:#1B7A3A; --ok-lt:#E6F4EA; --bad:#B3261E; --bad-lt:#FBEAE8;
+  --is:#FFF4D1; --re:#E3ECF9; --bs:#E8EEF8;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Open Sans",Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5;font-size:16px}
+h1,h2,h3,h4{font-family:Montserrat,Arial,sans-serif;color:var(--navy);margin:0 0 .5rem}
+button,select,input{font:inherit}
+header{background:var(--navy);color:#fff;border-bottom:5px solid var(--gold)}
+.wrap{max-width:1080px;margin:0 auto;padding:0 16px}
+.hdr{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;padding:18px 16px}
+.hdr h1{color:#fff;font-size:1.6rem;margin:0}
+.hdr .sub{color:var(--gold);font-family:Montserrat,Arial,sans-serif;font-weight:700;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase}
+.co{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.25);border-radius:8px;padding:8px 12px;font-size:.9rem}
+.co b{color:var(--gold)}
+nav.tabs{background:var(--navy-dk)}
+nav.tabs .wrap{display:flex;gap:4px;overflow-x:auto}
+.tab{background:none;border:0;color:#C9D4E8;padding:12px 16px;cursor:pointer;font-family:Montserrat,Arial,sans-serif;font-weight:700;font-size:.92rem;border-bottom:4px solid transparent;white-space:nowrap}
+.tab[aria-selected="true"]{color:#fff;border-bottom-color:var(--gold)}
+.tab:hover{color:#fff}
+.tab:focus-visible,.btn:focus-visible,select:focus-visible,.chip:focus-visible{outline:3px solid var(--gold);outline-offset:2px}
+main{padding:20px 0 40px}
+.panel{display:none}.panel.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;margin-bottom:16px}
+.intro{color:var(--muted);margin:0 0 14px}
+.btn{border:2px solid var(--navy);background:var(--navy);color:#fff;border-radius:6px;padding:8px 14px;cursor:pointer;font-weight:700;font-size:.92rem}
+.btn:hover{background:var(--navy-dk);border-color:var(--navy-dk)}
+.btn.gold{background:var(--gold);border-color:var(--gold);color:var(--navy-dk)}
+.btn.gold:hover{background:#F2B700;border-color:#F2B700}
+.btn.ghost{background:#fff;color:var(--navy)}
+.btn.ghost:hover{background:var(--blue-lt)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.spacer{flex:1}
+select,input[type=number]{border:1.5px solid #9AA6BC;border-radius:6px;padding:7px 8px;background:#fff;color:var(--ink);min-height:40px}
+.seedbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center;background:var(--gold-lt);border:1px solid #F0D98A;border-radius:8px;padding:10px 12px;margin-bottom:16px;font-size:.92rem}
+.seedbar input{width:110px}
+.seedbar b{color:var(--navy)}
+
+/* Learn diagram */
+.eqbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px;background:var(--navy);border-radius:10px;padding:16px;margin-bottom:16px}
+.eqbar .op{color:var(--gold);font-family:Montserrat,Arial,sans-serif;font-weight:800;font-size:1.6rem}
+.statements{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.stmt{border-radius:10px;padding:14px;border:1px solid var(--line)}
+.stmt h3{font-size:1rem;margin-bottom:10px}
+.stmt.is{background:var(--is)} .stmt.re{background:var(--re)} .stmt.bs{background:var(--bs)}
+.stmt .line{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:6px 0}
+.stmt .sym{font-weight:800;color:var(--navy);width:16px;text-align:center}
+.stmt hr{border:0;border-top:2px solid var(--navy);margin:8px 0}
+.stmt .flow{font-size:.8rem;color:var(--muted);margin-top:10px;font-style:italic}
+.chip{border:2px solid var(--navy);background:#fff;color:var(--navy);border-radius:999px;padding:6px 14px;font-family:Montserrat,Arial,sans-serif;font-weight:700;font-size:.88rem;cursor:pointer}
+.chip:hover{background:var(--blue-lt)}
+.chip.sel{background:var(--navy);color:#fff}
+.eqbar .chip{border-color:var(--gold);font-size:1rem;padding:8px 18px}
+.eqbar .chip.sel{background:var(--gold);color:var(--navy-dk)}
+.detail{border-left:6px solid var(--gold);margin-top:16px}
+.detail .def{font-size:1.15rem;font-weight:600;margin:4px 0 12px}
+.detail .tag{display:inline-block;background:var(--blue-lt);color:var(--navy);border-radius:4px;padding:2px 8px;font-size:.8rem;font-weight:700;margin-bottom:8px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mini{background:var(--bg);border-radius:8px;padding:10px 12px;font-size:.92rem}
+.mini h4{font-size:.85rem;margin-bottom:4px}
+.mini ul{margin:0;padding-left:18px}
+
+/* Quiz */
+.qtext{font-size:1.1rem;font-weight:600;margin:6px 0 14px}
+.qtype{font-size:.78rem;text-transform:uppercase;letter-spacing:.06em;font-weight:700;color:var(--muted)}
+.score{font-family:Montserrat,Arial,sans-serif;font-weight:700;color:var(--navy);background:var(--blue-lt);border-radius:6px;padding:6px 10px;font-size:.88rem}
+.fb{margin-top:14px;border-radius:8px;padding:12px 14px;display:none}
+.fb.show{display:block}
+.fb.ok{background:var(--ok-lt);border-left:5px solid var(--ok)}
+.fb.bad{background:var(--bad-lt);border-left:5px solid var(--bad)}
+.fb.info{background:var(--blue-lt);border-left:5px solid var(--navy)}
+.fb h4{margin:0 0 4px;font-size:1rem}
+.fb.ok h4{color:var(--ok)} .fb.bad h4{color:var(--bad)}
+.fb ul{margin:6px 0 0;padding-left:20px}
+.fb li{margin:6px 0}
+
+/* Transactions */
+.modes{display:inline-flex;border:2px solid var(--navy);border-radius:8px;overflow:hidden}
+.modes button{border:0;background:#fff;color:var(--navy);padding:8px 14px;font-weight:700;cursor:pointer}
+.modes button[aria-pressed="true"]{background:var(--navy);color:#fff}
+.txhead{display:flex;flex-wrap:wrap;align-items:center;gap:10px;margin-bottom:6px}
+.txnum{font-family:Montserrat,Arial,sans-serif;font-weight:700;color:var(--muted);font-size:.85rem}
+.txdate{background:var(--gold);color:var(--navy-dk);font-weight:700;border-radius:4px;padding:2px 8px;font-size:.85rem}
+.txtext{font-size:1.12rem;font-weight:600;margin:6px 0 14px;border-left:4px solid var(--navy);padding-left:12px}
+table.fx{width:100%;border-collapse:collapse;margin-top:6px}
+table.fx th{text-align:left;font-size:.8rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);border-bottom:2px solid var(--line);padding:6px}
+table.fx td{padding:8px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+.up{color:var(--ok);font-weight:700}.down{color:var(--bad);font-weight:700}
+.ansrow{display:grid;grid-template-columns:28px 1.4fr 1fr 1fr 28px;gap:8px;align-items:center;margin-bottom:8px}
+.ansrow .n{font-weight:700;color:var(--muted)}
+.ansrow select{width:100%}
+.ansrow .mark{font-weight:800;font-size:1.1rem;text-align:center}
+.ansrow.okr select{border-color:var(--ok);background:var(--ok-lt)}
+.ansrow.badr select{border-color:var(--bad);background:var(--bad-lt)}
+.colhdr{display:grid;grid-template-columns:28px 1.4fr 1fr 1fr 28px;gap:8px;font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:700;margin-bottom:4px}
+.eqcheck{margin-top:12px;font-family:Montserrat,Arial,sans-serif;font-weight:700;font-size:.92rem;background:var(--navy);color:#fff;border-radius:8px;padding:10px 12px;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.eqcheck .g{color:var(--gold)}
+.eqcheck .badge{margin-left:auto;background:#fff;border-radius:4px;padding:2px 8px;font-size:.8rem}
+.eqcheck .badge.ok{color:var(--ok)} .eqcheck .badge.no{color:var(--bad)}
+details.cheat{margin-top:14px;background:var(--bg);border-radius:8px;padding:8px 12px;font-size:.9rem}
+details.cheat summary{cursor:pointer;font-weight:700;color:var(--navy)}
+details.cheat dl{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;margin:8px 0 0}
+details.cheat dt{font-weight:700}
+details.cheat dd{margin:0}
+.navrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px;align-items:center}
+.progress{height:6px;background:var(--line);border-radius:3px;overflow:hidden;margin-bottom:12px}
+.progress div{height:100%;background:var(--gold);transition:width .2s}
+.note{font-size:.85rem;color:var(--muted)}
+footer{text-align:center;color:var(--muted);font-size:.8rem;padding:10px 0 24px}
+
+@media (max-width:820px){
+  .statements{grid-template-columns:1fr}
+  .grid2{grid-template-columns:1fr}
+}
+@media (max-width:560px){
+  .colhdr{display:none}
+  .ansrow{grid-template-columns:1fr 1fr;background:var(--bg);border-radius:8px;padding:8px}
+  .ansrow .n{grid-column:1;grid-row:1}
+  .ansrow .n::before{content:"Line "}
+  .ansrow .mark{grid-column:2;grid-row:1;text-align:right}
+  .ansrow .elsel{grid-column:1 / 3;grid-row:2}
+  .ansrow .dirsel{grid-column:1;grid-row:3}
+  .ansrow .amtsel{grid-column:2;grid-row:3}
+  .hdr h1{font-size:1.3rem}
+}
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap hdr">
+    <div>
+      <div class="sub">University of New Haven · Financial Accounting</div>
+      <h1>Elements of Accounting</h1>
+    </div>
+    <div class="co">Company: <b>Problem Solvers, Inc.</b> · Year 1: <b id="yrLabel"></b></div>
+  </div>
+</header>
+<nav class="tabs" aria-label="Sections">
+  <div class="wrap" role="tablist">
+    <button class="tab" role="tab" aria-selected="true" aria-controls="p-learn" id="t-learn">1 · Learn the Elements</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-quiz" id="t-quiz">2 · Identify the Element</button>
+    <button class="tab" role="tab" aria-selected="false" aria-controls="p-tx" id="t-tx">3 · Transaction Effects</button>
+  </div>
+</nav>
+
+<main class="wrap">
+  <!-- LEARN -->
+  <section class="panel active" id="p-learn" role="tabpanel" aria-labelledby="t-learn">
+    <p class="intro">Click any element to see its definition, where it is reported, and what makes it go up or down.</p>
+    <div class="eqbar" aria-label="The accounting equation">
+      <button class="chip" data-el="A">Assets</button><span class="op">=</span>
+      <button class="chip" data-el="L">Liabilities</button><span class="op">+</span>
+      <button class="chip" data-el="EQ">Equity</button>
+    </div>
+    <div class="statements">
+      <div class="stmt is">
+        <h3>Income Statement</h3>
+        <div class="line"><span class="sym">+</span><button class="chip" data-el="REV">Revenue</button></div>
+        <div class="line"><span class="sym">−</span><button class="chip" data-el="EXP">Expenses</button></div>
+        <div class="line"><span class="sym">+</span><button class="chip" data-el="GAIN">Gains</button></div>
+        <div class="line"><span class="sym">−</span><button class="chip" data-el="LOSS">Losses</button></div>
+        <hr>
+        <div class="line"><span class="sym">=</span><button class="chip" data-el="NI">Net Income</button></div>
+        <div class="flow">Net Income flows to the Statement of Retained Earnings →</div>
+      </div>
+      <div class="stmt re">
+        <h3>Statement of Retained Earnings</h3>
+        <div class="line"><span class="sym"></span><button class="chip" data-el="BRE">Beginning R/E</button></div>
+        <div class="line"><span class="sym">+</span><button class="chip" data-el="NI">Net Income</button></div>
+        <div class="line"><span class="sym">−</span><button class="chip" data-el="DIV">Dividends</button></div>
+        <hr>
+        <div class="line"><span class="sym">=</span><button class="chip" data-el="RE">Ending Retained Earnings</button></div>
+        <div class="flow">Ending Retained Earnings flows to the Balance Sheet →</div>
+      </div>
+      <div class="stmt bs">
+        <h3>Balance Sheet</h3>
+        <div class="line"><span class="sym"></span><button class="chip" data-el="A">Assets</button></div>
+        <div class="line"><span class="sym">=</span><button class="chip" data-el="L">Liabilities</button></div>
+        <div class="line"><span class="sym">+</span><button class="chip" data-el="EQ">Equity</button></div>
+        <div class="line" style="padding-left:22px"><span class="sym" style="font-size:.8rem">↳</span><button class="chip" data-el="PIC">Paid-in Capital</button></div>
+        <div class="line" style="padding-left:22px"><span class="sym" style="font-size:.8rem">↳</span><button class="chip" data-el="RE">Retained Earnings</button></div>
+        <div class="flow">Equity = Paid-in Capital + Retained Earnings</div>
+      </div>
+    </div>
+    <div class="card detail" id="detail" aria-live="polite"></div>
+  </section>
+
+  <!-- QUIZ -->
+  <section class="panel" id="p-quiz" role="tabpanel" aria-labelledby="t-quiz">
+    <p class="intro">Read the definition or account name and choose the element it belongs to.</p>
+    <div class="card">
+      <div class="row" style="margin-bottom:10px">
+        <label for="qFilter"><b>Practice:</b></label>
+        <select id="qFilter">
+          <option value="mix">Mixed</option>
+          <option value="def">Definitions only</option>
+          <option value="acct">Account names only</option>
+        </select>
+        <span class="spacer"></span>
+        <span class="score" id="qScore">Score: 0 / 0</span>
+      </div>
+      <div class="progress"><div id="qProg" style="width:0"></div></div>
+      <div class="qtype" id="qType"></div>
+      <div class="qtext" id="qText"></div>
+      <div class="row">
+        <label for="qAns" class="note">Element:</label>
+        <select id="qAns"></select>
+        <button class="btn gold" id="qCheck">Check</button>
+        <button class="btn ghost" id="qNext">Next →</button>
+      </div>
+      <div class="fb" id="qFb" aria-live="polite"></div>
+    </div>
+  </section>
+
+  <!-- TRANSACTIONS -->
+  <section class="panel" id="p-tx" role="tabpanel" aria-labelledby="t-tx">
+    <p class="intro">Identify which elements each transaction affects, whether each one increases or decreases, and by how much.</p>
+    <div class="seedbar">
+      <span>Practice set <b>#</b></span>
+      <input type="number" id="seedIn" min="1" max="99999" aria-label="Practice set number">
+      <button class="btn ghost" id="seedGo">Load set</button>
+      <button class="btn gold" id="seedNew">New numbers</button>
+      <span class="spacer"></span>
+      <label class="row" style="gap:6px"><input type="checkbox" id="shuffle"> Random order</label>
+    </div>
+    <div class="row" style="margin-bottom:14px">
+      <div class="modes" role="group" aria-label="Mode">
+        <button id="mSee" aria-pressed="true">See the answers</button>
+        <button id="mTry" aria-pressed="false">Try it myself</button>
+      </div>
+      <span class="spacer"></span>
+      <span class="score" id="txScore">First-try correct: 0 / 0</span>
+    </div>
+    <div class="card">
+      <div class="progress"><div id="txProg" style="width:0"></div></div>
+      <div class="txhead">
+        <span class="txnum" id="txNum"></span>
+        <span class="txdate" id="txDate"></span>
+      </div>
+      <div class="txtext" id="txText"></div>
+
+      <div id="seeArea">
+        <button class="btn gold" id="reveal">Show effects</button>
+        <div id="seeAns"></div>
+      </div>
+
+      <div id="tryArea" hidden>
+        <div class="colhdr"><span></span><span>Element</span><span>Effect</span><span>Amount</span><span></span></div>
+        <div id="ansRows"></div>
+        <p class="note" style="margin:4px 0 0">Use only the lines you need. Leave unused lines set to “— none —”.</p>
+        <div class="row" style="margin-top:12px">
+          <button class="btn gold" id="txCheck">Check my answer</button>
+          <button class="btn ghost" id="txShow">Show answer</button>
+          <button class="btn ghost" id="txClear">Clear</button>
+        </div>
+        <div class="fb" id="txFb" aria-live="polite"></div>
+        <details class="cheat">
+          <summary>Quick reference: element definitions</summary>
+          <dl id="cheatList"></dl>
+        </details>
+      </div>
+
+      <div class="navrow">
+        <button class="btn ghost" id="prev">← Previous</button>
+        <button class="btn" id="next">Next →</button>
+      </div>
+    </div>
+    <p class="note">Revenue, expenses, gains, losses, and dividends all flow into Retained Earnings, so choose the specific element rather than “Retained Earnings.” Inventory is recorded with the <b>periodic</b> system.</p>
+  </section>
+</main>
+<footer>Problem Solvers, Inc. is a fictional company used for practice. Amounts change with each practice set.</footer>
+
+<script>
+(function(){
+"use strict";
+const YEAR = new Date().getFullYear();
+document.getElementById('yrLabel').textContent = YEAR;
+const $ = n => '$' + Math.round(n).toLocaleString('en-US');
+
+/* ---------- Elements ---------- */
+const EL = {
+  A:   {name:'Assets', stmt:'Balance Sheet', def:'Resources the business controls that have future benefit.',
+        up:['Receiving cash or other resources','Buying equipment, supplies, or prepaid services','Performing services on account (Accounts Receivable)'],
+        down:['Paying cash','Using up supplies or prepaid items','Depreciation of equipment'],
+        ex:'Cash, Accounts Receivable, Office Supplies, Prepaid Insurance, Equipment, Inventory'},
+  L:   {name:'Liabilities', stmt:'Balance Sheet', def:'Debts — creditors’ (such as the bank’s) claims to the business’s resources.',
+        up:['Borrowing money','Buying on account','Receiving cash before the work is done','Owing bills or wages not yet paid'],
+        down:['Paying off debts','Doing the work a customer already paid for'],
+        ex:'Accounts Payable, Notes Payable, Salaries Payable, Unearned Revenue, Interest Payable'},
+  EQ:  {name:'Equity', stmt:'Balance Sheet', def:'Owners’ (shareholders’) claims to the business’s resources. Equity = Assets − Liabilities.',
+        up:['Owners contribute resources (Paid-in Capital)','Earning revenue and gains (via Retained Earnings)'],
+        down:['Expenses and losses','Paying dividends'],
+        ex:'Paid-in Capital + Retained Earnings'},
+  PIC: {name:'Paid-in Capital', stmt:'Balance Sheet (part of Equity)', def:'Ownership created when owners contribute resources to the business.',
+        up:['Issuing stock to owners for cash or other assets'], down:['Rare in introductory courses (e.g., buying back stock)'],
+        ex:'Common Stock'},
+  RE:  {name:'Retained Earnings', stmt:'Balance Sheet (part of Equity); ending balance from the Statement of Retained Earnings', def:'Earnings reinvested in (kept in) the business.',
+        up:['Net income'], down:['Net loss','Dividends'],
+        ex:'Retained Earnings = Beginning R/E + Net Income − Dividends'},
+  BRE: {name:'Beginning Retained Earnings', stmt:'Statement of Retained Earnings', def:'All earnings reinvested in the business in prior periods.',
+        up:['n/a — it is last period’s ending balance'], down:['n/a — it is last period’s ending balance'],
+        ex:'In the first year of operations (like Problem Solvers this year), Beginning R/E is $0.'},
+  REV: {name:'Revenue', stmt:'Income Statement', def:'Earnings from doing what the business is in business to do.',
+        up:['Performing consulting services (cash or on account)','Selling how-to guides','Earning revenue that was paid in advance'], down:['Rare in introductory courses'],
+        ex:'Consulting Revenue, Sales Revenue'},
+  EXP: {name:'Expenses', stmt:'Income Statement', def:'Resources used up in pursuit of revenue.',
+        up:['Rent, salaries, utilities, interest','Supplies used, insurance expired, depreciation','Purchases of inventory (periodic system → Cost of Goods Sold)'], down:['Rare in introductory courses'],
+        ex:'Rent Expense, Salaries Expense, Utilities Expense, Supplies Expense, Depreciation Expense, Interest Expense, Cost of Goods Sold'},
+  GAIN:{name:'Gains', stmt:'Income Statement', def:'Earnings from unusual (peripheral) business activities.',
+        up:['Selling equipment for more than its book value'], down:['Rare in introductory courses'],
+        ex:'Gain on Sale of Equipment'},
+  LOSS:{name:'Losses', stmt:'Income Statement', def:'Resources used up in unusual (peripheral) business activities.',
+        up:['Selling equipment for less than its book value'], down:['Rare in introductory courses'],
+        ex:'Loss on Sale of Equipment'},
+  NI:  {name:'Net Income', stmt:'Income Statement (bottom line); also on the Statement of Retained Earnings', def:'Current-period income: Revenue + Gains − Expenses − Losses.',
+        up:['More revenue or gains'], down:['More expenses or losses'],
+        ex:'If expenses and losses exceed revenue and gains, the result is a Net Loss.'},
+  DIV: {name:'Dividends', stmt:'Statement of Retained Earnings', def:'Earnings not reinvested — returned to shareholders.',
+        up:['Declaring/paying dividends to shareholders'], down:['Rare in introductory courses'],
+        ex:'Dividends (not an expense!)'}
+};
+const N = k => EL[k].name;
+
+/* ---------- Learn tab ---------- */
+const detail = document.getElementById('detail');
+function showEl(k){
+  const e = EL[k];
+  document.querySelectorAll('#p-learn .chip').forEach(c=>c.classList.toggle('sel', c.dataset.el===k));
+  detail.innerHTML = `<span class="tag">${e.stmt}</span><h2>${e.name}</h2>
+    <p class="def">${e.def}</p>
+    <div class="grid2">
+      <div class="mini"><h4>Increases when…</h4><ul>${e.up.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+      <div class="mini"><h4>Decreases when…</h4><ul>${e.down.map(x=>`<li>${x}</li>`).join('')}</ul></div>
+    </div>
+    <div class="mini" style="margin-top:12px"><h4>Problem Solvers, Inc. examples</h4>${e.ex}</div>
+    ${['REV','GAIN'].includes(k)?'<p class="note" style="margin-top:10px">Increases Net Income → increases Retained Earnings → increases Equity.</p>':''}
+    ${['EXP','LOSS','DIV'].includes(k)?'<p class="note" style="margin-top:10px">Decreases Retained Earnings → decreases Equity.</p>':''}`;
+}
+document.querySelectorAll('#p-learn .chip').forEach(c=>c.addEventListener('click',()=>showEl(c.dataset.el)));
+showEl('A');
+
+/* ---------- Tabs ---------- */
+const tabs = [...document.querySelectorAll('.tab')];
+tabs.forEach(t=>t.addEventListener('click',()=>{
+  tabs.forEach(x=>{x.setAttribute('aria-selected', x===t?'true':'false');});
+  document.querySelectorAll('.panel').forEach(p=>p.classList.toggle('active', p.id===t.getAttribute('aria-controls')));
+}));
+
+/* ---------- Seeded RNG ---------- */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function shuffleArr(arr, rng){const a=arr.slice();for(let i=a.length-1;i>0;i--){const j=Math.floor(rng()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+/* ---------- Identify quiz ---------- */
+const ACCT_OPTS = ['A','L','PIC','RE','REV','EXP','GAIN','LOSS','DIV'];
+const DEF_OPTS = ['A','L','EQ','PIC','RE','BRE','REV','EXP','GAIN','LOSS','NI','DIV'];
+const DEF_Q = [
+  ['A','Resources the business controls that have future benefit.'],
+  ['L','Debts — creditors’ claims to the business’s resources.'],
+  ['EQ','Owners’ claims to the business’s resources; what is left after subtracting liabilities from assets.'],
+  ['PIC','Ownership created when owners contribute resources to the business.'],
+  ['RE','Earnings that have been reinvested in the business.'],
+  ['BRE','All earnings reinvested in the business in prior periods.'],
+  ['REV','Earnings from doing what the business is in business to do.'],
+  ['EXP','Resources used up in pursuit of revenue.'],
+  ['GAIN','Earnings from unusual business activities.'],
+  ['LOSS','Resources used up in unusual business activities.'],
+  ['NI','Current-period income: revenue and gains minus expenses and losses.'],
+  ['DIV','Earnings not reinvested — returned to shareholders.']
+];
+const ACCT_Q = [
+  ['Cash','A','Cash is a resource the company controls and can use in the future.'],
+  ['Accounts Receivable','A','Amounts clients owe Problem Solvers — the right to collect cash later is a future benefit.'],
+  ['Office Supplies','A','Supplies on hand will be used in the future, so they are a resource with future benefit.'],
+  ['Prepaid Insurance','A','Insurance paid in advance gives future coverage — a future benefit. It becomes an expense only as it expires.'],
+  ['Equipment','A','Equipment will help the company earn revenue for several years.'],
+  ['Inventory (how-to guides on hand)','A','Guides on hand will be sold in the future, so they are an asset.'],
+  ['Accounts Payable','L','Amounts the company owes suppliers — a creditor’s claim.'],
+  ['Notes Payable','L','A formal written promise to repay borrowed money — a debt.'],
+  ['Salaries Payable','L','Wages earned by employees but not yet paid — the company owes them.'],
+  ['Unearned Revenue','L','Cash received before the work is done. The company owes the client the service, so it is a liability, not revenue.'],
+  ['Interest Payable','L','Interest owed but not yet paid is a debt.'],
+  ['Common Stock','PIC','Stock issued to owners for their contributions creates paid-in capital.'],
+  ['Retained Earnings','RE','The account that holds earnings reinvested in the business.'],
+  ['Consulting Revenue','REV','Consulting is what Problem Solvers is in business to do.'],
+  ['Sales Revenue (how-to guides)','REV','Selling guides becomes part of the company’s main business.'],
+  ['Rent Expense','EXP','Office space used up to earn revenue.'],
+  ['Salaries Expense','EXP','Employee work used up to earn revenue.'],
+  ['Utilities Expense','EXP','Electricity, internet, etc. used up to earn revenue.'],
+  ['Supplies Expense','EXP','The portion of supplies used up during the period.'],
+  ['Insurance Expense','EXP','The portion of prepaid insurance that has expired.'],
+  ['Depreciation Expense','EXP','The portion of equipment cost used up this period.'],
+  ['Interest Expense','EXP','The cost of borrowing money — used up in operating the business.'],
+  ['Cost of Goods Sold','EXP','The cost of the guides sold — resources used up to earn sales revenue.'],
+  ['Purchases (periodic system)','EXP','Under the periodic system, inventory purchases are recorded in Purchases, which becomes part of Cost of Goods Sold.'],
+  ['Gain on Sale of Equipment','GAIN','Selling equipment is not the company’s main business; earning more than book value is a gain.'],
+  ['Loss on Sale of Equipment','LOSS','Selling equipment for less than book value uses up resources in a peripheral activity — a loss.'],
+  ['Dividends','DIV','Earnings distributed to shareholders. Not an expense — they were not used to earn revenue.']
+];
+const qState = {list:[], i:0, right:0, done:0, answered:false};
+const qSel = document.getElementById('qAns'), qFb = document.getElementById('qFb');
+function buildQuiz(){
+  const f = document.getElementById('qFilter').value;
+  let pool = [];
+  if(f!=='acct') pool = pool.concat(DEF_Q.map(([k,t])=>({type:'def',k,t})));
+  if(f!=='def') pool = pool.concat(ACCT_Q.map(([t,k,why])=>({type:'acct',k,t,why})));
+  qState.list = shuffleArr(pool, Math.random);
+  qState.i=0; qState.right=0; qState.done=0;
+  renderQ();
+}
+function renderQ(){
+  const q = qState.list[qState.i];
+  qState.answered=false;
+  document.getElementById('qType').textContent = (q.type==='def'?'Definition':'Account name') + ` · ${qState.i+1} of ${qState.list.length}`;
+  document.getElementById('qText').textContent = q.type==='def' ? `“${q.t}”` : `Which element does the account “${q.t}” belong to?`;
+  const opts = q.type==='def'?DEF_OPTS:ACCT_OPTS;
+  qSel.innerHTML = '<option value="">— choose —</option>' + opts.map(k=>`<option value="${k}">${N(k)}</option>`).join('');
+  qFb.className='fb'; qFb.innerHTML='';
+  document.getElementById('qProg').style.width = (qState.i/qState.list.length*100)+'%';
+  document.getElementById('qScore').textContent = `Score: ${qState.right} / ${qState.done}`;
+}
+const QMISS = {
+  'L>REV':'Unearned revenue is not revenue yet — the work has not been performed.',
+  'DIV>EXP':'Dividends are not expenses. They are not used up to earn revenue; they are earnings given back to shareholders.',
+  'EXP>DIV':'Dividends are payments to owners, not resources used to earn revenue.',
+  'A>EXP':'If the item still provides future benefit, it is an asset. It becomes an expense only when it is used up.',
+  'GAIN>REV':'Revenue comes from the main business (consulting, selling guides). Selling equipment is a peripheral activity, so it produces a gain.',
+  'LOSS>EXP':'Expenses are used up to earn revenue. A loss comes from an unusual or peripheral activity, like selling equipment below book value.',
+  'PIC>REV':'Money contributed by owners is not earned — it creates paid-in capital.',
+  'RE>NI':'Net income is for the current period only. Retained earnings accumulate all reinvested earnings over time.',
+  'NI>RE':'Retained earnings include all past reinvested earnings; net income is only this period’s result.',
+  'BRE>RE':'Beginning R/E is the balance carried in from prior periods, before this period’s net income and dividends.',
+  'EQ>PIC':'Paid-in capital is only one part of equity. Equity is the total owners’ claim (paid-in capital + retained earnings).',
+  'EXP>A':'Under the periodic system, purchases go to the Purchases account, which becomes part of Cost of Goods Sold (an expense).'
+};
+document.getElementById('qCheck').addEventListener('click',()=>{
+  const q = qState.list[qState.i], v = qSel.value;
+  if(!v){qFb.className='fb show info';qFb.innerHTML='<h4>Choose an element first.</h4>';return;}
+  const ok = v===q.k;
+  if(!qState.answered){qState.done++; if(ok) qState.right++; qState.answered=true;}
+  const why = q.type==='acct' ? q.why : `${N(q.k)}: ${EL[q.k].def}`;
+  let extra = '';
+  if(!ok){
+    extra = QMISS[q.k+'>'+v] ? `<p>${QMISS[q.k+'>'+v]}</p>` : `<p><b>${N(v)}</b> means: ${EL[v].def}</p>`;
+  }
+  qFb.className = 'fb show ' + (ok?'ok':'bad');
+  qFb.innerHTML = ok ? `<h4>Correct — ${N(q.k)}</h4><p>${why}</p>`
+                     : `<h4>Not quite — the answer is ${N(q.k)}</h4>${extra}<p>${why}</p>`;
+  document.getElementById('qScore').textContent = `Score: ${qState.right} / ${qState.done}`;
+});
+document.getElementById('qNext').addEventListener('click',()=>{
+  qState.i++;
+  if(qState.i>=qState.list.length){
+    const pct = qState.done?Math.round(qState.right/qState.done*100):0;
+    qFb.className='fb show info';
+    qFb.innerHTML=`<h4>Round complete: ${qState.right} / ${qState.done} (${pct}%)</h4><p>A new shuffled round has started.</p>`;
+    const keep = qFb.innerHTML;
+    buildQuiz(); qFb.className='fb show info'; qFb.innerHTML=keep;
+    return;
+  }
+  renderQ();
+});
+document.getElementById('qFilter').addEventListener('change',buildQuiz);
+buildQuiz();
+
+/* ---------- Transactions ---------- */
+const TX_OPTS = ['A','L','PIC','REV','EXP','GAIN','LOSS','DIV'];
+const fx = (el,dir,amt,why)=>({el,dir,amt,why});
+
+function buildTx(rng){
+  const n=(min,max,step)=>min+step*Math.floor(rng()*(Math.floor((max-min)/step)+1));
+  const S=n(30000,60000,5000), NOTE=n(10000,25000,1000), EQP=n(6000,12000,500), SUP=n(600,1500,50),
+    INSM=n(100,200,10), INS=INSM*12, C1=n(3000,6000,250), RENT=n(1200,2400,100), AR=n(4000,8000,250),
+    COL=n(2000,AR-1000,250), UNE=n(2400,4800,200), SAL=n(3000,6000,250), UTIL=n(250,600,25),
+    CASH2=n(1500,3000,250), AR2=n(1000,2500,250), PUR=n(2000,5000,250), SALES=n(3000,7000,250),
+    BV=n(800,1500,50), GN=n(100,400,25), INT=n(200,600,25), PRIN=n(2000,5000,500),
+    BV2=n(900,1600,50), LS=n(100,500,25), DV=n(1000,3000,250), SU=n(300,SUP-200,50),
+    EARN=n(1200,UNE-400,200), ACC=n(800,1600,100), DEP=n(1000,2000,100);
+  const T = [
+  {d:'Jan 2', t:`Problem Solvers, Inc. issued common stock to its founders in exchange for ${$(S)} cash.`,
+   e:[fx('A','+',S,`Cash (an asset) increases by ${$(S)}.`), fx('PIC','+',S,`Owners contributed resources in exchange for stock, creating paid-in capital.`)],
+   mis:{REV:'Cash from owners is not revenue — the company did not earn it by providing services. Owner contributions create paid-in capital.', L:'The company does not have to repay owners. Money from owners creates ownership (paid-in capital), not debt.', GAIN:'Owner contributions are not earnings of any kind; they create paid-in capital.'}},
+  {d:'Jan 3', t:`Borrowed ${$(NOTE)} from the bank by signing a note payable.`,
+   e:[fx('A','+',NOTE,`Cash increases by ${$(NOTE)}.`), fx('L','+',NOTE,`The company now owes the bank — Notes Payable (a liability) increases.`)],
+   mis:{REV:'Borrowed money must be repaid, so it is not earned. It creates a liability.', PIC:'The bank is a creditor, not an owner. Borrowing creates a liability.'}},
+  {d:'Jan 5', t:`Purchased office equipment for ${$(EQP)} cash.`,
+   e:[fx('A','+',EQP,`Equipment (an asset) increases — it will benefit future periods.`), fx('A','-',EQP,`Cash (an asset) decreases. One asset is exchanged for another, so total assets do not change.`)],
+   mis:{EXP:'Equipment is not used up immediately; it provides future benefit, so it is recorded as an asset. It becomes expense gradually through depreciation.', L:'The equipment was paid for in cash, so nothing is owed.'}},
+  {d:'Jan 8', t:`Purchased office supplies on account for ${$(SUP)}.`,
+   e:[fx('A','+',SUP,`Office Supplies (an asset) increase — they will be used in the future.`), fx('L','+',SUP,`“On account” means the company will pay later — Accounts Payable increases.`)],
+   mis:{EXP:'The supplies have not been used yet, so they are still an asset. They become Supplies Expense when used.'}},
+  {d:'Feb 1', t:`Paid ${$(INS)} cash for a 12-month insurance policy covering February ${YEAR} through January ${YEAR+1}.`,
+   e:[fx('A','+',INS,`Prepaid Insurance (an asset) increases — the coverage is a future benefit.`), fx('A','-',INS,`Cash decreases by ${$(INS)}.`)],
+   mis:{EXP:'The coverage has not been used yet. Paying in advance creates an asset (Prepaid Insurance); it becomes expense as each month passes.'}},
+  {d:'Jan 31', t:`Provided consulting services to clients and received ${$(C1)} cash.`,
+   e:[fx('A','+',C1,`Cash increases by ${$(C1)}.`), fx('REV','+',C1,`Consulting is what Problem Solvers is in business to do, so the earnings are revenue.`)],
+   mis:{GAIN:'Consulting is the company’s main business, so these earnings are revenue, not a gain.', PIC:'Clients are not owners. Cash earned from services is revenue.', L:'The service has already been performed, so nothing is owed to the client.'}},
+  {d:'Feb 1', t:`Paid ${$(RENT)} cash for February office rent.`,
+   e:[fx('EXP','+',RENT,`The office space is used up during February to earn revenue — Rent Expense.`), fx('A','-',RENT,`Cash decreases by ${$(RENT)}.`)],
+   mis:{DIV:'Rent is a cost of operating the business, not a payment to shareholders.', LOSS:'Rent is a normal cost of earning revenue, so it is an expense, not a loss.'}},
+  {d:'Feb 14', t:`Provided consulting services to a client on account, ${$(AR)}.`,
+   e:[fx('A','+',AR,`Accounts Receivable (an asset) increases — the client owes the company.`), fx('REV','+',AR,`Revenue is recorded when the service is performed, even though cash has not been received.`)],
+   mis:{L:'The client owes Problem Solvers, not the other way around — that is a receivable (asset).'}},
+  {d:'Feb 28', t:`Collected ${$(COL)} cash from the client billed on February 14.`,
+   e:[fx('A','+',COL,`Cash increases by ${$(COL)}.`), fx('A','-',COL,`Accounts Receivable decreases. One asset is exchanged for another.`)],
+   mis:{REV:'The revenue was already recorded on February 14 when the work was done. Collecting cash just exchanges Accounts Receivable for Cash.', L:'Collecting from a client does not create a debt; it reduces the amount the client owes.'}},
+  {d:'Mar 1', t:`Paid the ${$(SUP)} owed for the supplies purchased on January 8.`,
+   e:[fx('L','-',SUP,`Accounts Payable decreases — the debt is paid off.`), fx('A','-',SUP,`Cash decreases by ${$(SUP)}.`)],
+   mis:{EXP:'The supplies were already recorded as an asset. Paying the bill reduces the liability; it is not a new expense.'}},
+  {d:'Mar 10', t:`Received ${$(UNE)} cash from a client for consulting work that will be performed next month.`,
+   e:[fx('A','+',UNE,`Cash increases by ${$(UNE)}.`), fx('L','+',UNE,`The work has not been done, so the company owes the client a service — Unearned Revenue (a liability).`)],
+   mis:{REV:'Revenue is recorded only when it is earned. The work has not been performed yet, so the company has an obligation (liability).'}},
+  {d:'Mar 31', t:`Paid employee salaries of ${$(SAL)} for March.`,
+   e:[fx('EXP','+',SAL,`Employees’ work was used up to earn revenue — Salaries Expense.`), fx('A','-',SAL,`Cash decreases by ${$(SAL)}.`)],
+   mis:{L:'The salaries were paid in cash, so nothing is owed.', DIV:'Employees are paid for their work; that is an expense. Dividends go to shareholders.'}},
+  {d:'Apr 5', t:`Received the March utility bill for ${$(UTIL)}, to be paid next month.`,
+   e:[fx('EXP','+',UTIL,`Utilities were used up in March to operate the business — Utilities Expense.`), fx('L','+',UTIL,`The bill has not been paid, so Accounts Payable (Utilities Payable) increases.`)],
+   mis:{A:'No cash has been paid, so assets do not change. The unpaid bill is a liability.'}},
+  {d:'Apr 20', t:`Provided consulting services for ${$(CASH2+AR2)}: the client paid ${$(CASH2)} in cash and agreed to pay the remaining ${$(AR2)} next month.`,
+   e:[fx('A','+',CASH2+AR2,`Cash increases ${$(CASH2)} and Accounts Receivable increases ${$(AR2)} — total assets increase ${$(CASH2+AR2)}.`), fx('REV','+',CASH2+AR2,`All ${$(CASH2+AR2)} of the work was performed, so all of it is revenue — not just the cash portion.`)],
+   mis:{L:'The client owes the company (a receivable), not the other way around.'}},
+  {d:'May 1', t:`Problem Solvers began selling “how-to” guides. Purchased guides from a publisher on account for ${$(PUR)} (periodic system).`,
+   e:[fx('EXP','+',PUR,`Under the periodic system, purchases are recorded in the Purchases account, which becomes part of Cost of Goods Sold (an expense).`), fx('L','+',PUR,`“On account” — Accounts Payable increases.`)],
+   mis:{A:'In this course we use the periodic system: inventory purchases are recorded in Purchases (part of Cost of Goods Sold), not directly in the Inventory account.'}},
+  {d:'May 20', t:`Sold how-to guides to customers for ${$(SALES)} cash (periodic system).`,
+   e:[fx('A','+',SALES,`Cash increases by ${$(SALES)}.`), fx('REV','+',SALES,`Selling guides is now part of the company’s main business — Sales Revenue. Under the periodic system, no cost entry is made at the time of sale.`)],
+   mis:{GAIN:'Selling guides is part of the company’s normal business, so it produces revenue, not a gain.', EXP:'Under the periodic system, cost of goods sold is not recorded at each sale; it is determined at the end of the period.'}},
+  {d:'Jun 15', t:`Sold an old printer with a book value of ${$(BV)} for ${$(BV+GN)} cash.`,
+   e:[fx('A','+',BV+GN,`Cash increases by ${$(BV+GN)}.`), fx('A','-',BV,`The printer (book value ${$(BV)}) is removed from Equipment.`), fx('GAIN','+',GN,`Received ${$(BV+GN)} for an asset worth ${$(BV)} on the books — a ${$(GN)} gain from a peripheral activity.`)],
+   mis:{REV:'Selling equipment is not what Problem Solvers is in business to do, so the extra amount is a gain, not revenue.', LOSS:'The company received more than the book value, so this is a gain, not a loss.'}},
+  {d:'Jul 1', t:`Paid ${$(INT)} cash for interest on the bank note.`,
+   e:[fx('EXP','+',INT,`Interest is the cost of borrowing money — Interest Expense.`), fx('A','-',INT,`Cash decreases by ${$(INT)}.`)],
+   mis:{L:'Interest does not reduce the amount borrowed; it is the cost of borrowing, an expense.', LOSS:'Interest is a normal cost of financing the business, so it is an expense.'}},
+  {d:'Jul 1', t:`Repaid ${$(PRIN)} of the principal on the bank note.`,
+   e:[fx('L','-',PRIN,`Notes Payable decreases — the company owes the bank less.`), fx('A','-',PRIN,`Cash decreases by ${$(PRIN)}.`)],
+   mis:{EXP:'Repaying principal is not an expense — it just reduces a debt. Only interest is an expense.'}},
+  {d:'Aug 10', t:`Sold a laptop with a book value of ${$(BV2)} for ${$(BV2-LS)} cash.`,
+   e:[fx('A','+',BV2-LS,`Cash increases by ${$(BV2-LS)}.`), fx('A','-',BV2,`The laptop (book value ${$(BV2)}) is removed from Equipment.`), fx('LOSS','+',LS,`Received ${$(LS)} less than book value in a peripheral activity — a loss.`)],
+   mis:{EXP:'The resource was used up in selling equipment (a peripheral activity), not to earn revenue, so it is a loss.', GAIN:'The company received less than book value, so this is a loss, not a gain.'}},
+  {d:'Sep 30', t:`Paid cash dividends of ${$(DV)} to shareholders.`,
+   e:[fx('DIV','+',DV,`Earnings returned to shareholders instead of reinvested — Dividends (reduces Retained Earnings).`), fx('A','-',DV,`Cash decreases by ${$(DV)}.`)],
+   mis:{EXP:'Dividends are not expenses — they are not used up to earn revenue. They are a distribution of earnings to owners.', PIC:'Dividends reduce retained earnings, not paid-in capital.', LOSS:'Dividends are a choice to distribute earnings, not a loss.'}},
+  {d:'Dec 31', t:`Adjusting entry: a count shows ${$(SU)} of office supplies were used during the year.`,
+   e:[fx('EXP','+',SU,`Supplies used up to earn revenue become Supplies Expense.`), fx('A','-',SU,`Office Supplies (asset) decrease — they no longer provide future benefit.`)],
+   mis:{L:'No new amount is owed. Using supplies moves cost from an asset to an expense.'}},
+  {d:'Dec 31', t:`Adjusting entry: the insurance policy purchased on February 1 has been in effect for 11 months (${$(INSM)} per month).`,
+   e:[fx('EXP','+',INSM*11,`11 months × ${$(INSM)} = ${$(INSM*11)} of coverage used up — Insurance Expense.`), fx('A','-',INSM*11,`Prepaid Insurance decreases by the expired portion.`)],
+   mis:{L:'The insurance was paid in advance, so nothing is owed. The expired portion moves from asset to expense.'}},
+  {d:'Dec 31', t:`Adjusting entry: ${$(EARN)} of the consulting work paid for in advance on March 10 has been performed.`,
+   e:[fx('L','-',EARN,`Unearned Revenue decreases — the company no longer owes this work.`), fx('REV','+',EARN,`The work is now performed, so ${$(EARN)} is earned — Consulting Revenue.`)],
+   mis:{A:'No new cash is received — it was collected in March. Doing the work reduces the liability and records revenue.'}},
+  {d:'Dec 31', t:`Adjusting entry: employees earned ${$(ACC)} of salaries in late December that will be paid in January.`,
+   e:[fx('EXP','+',ACC,`The employees’ work was used up this year — Salaries Expense.`), fx('L','+',ACC,`The salaries are owed but unpaid — Salaries Payable.`)],
+   mis:{A:'No cash has been paid yet, so assets do not change. The amount owed is a liability.'}},
+  {d:'Dec 31', t:`Adjusting entry: recorded ${$(DEP)} of depreciation on office equipment.`,
+   e:[fx('EXP','+',DEP,`Part of the equipment’s cost was used up this year — Depreciation Expense.`), fx('A','-',DEP,`Accumulated Depreciation (a contra-asset) increases, which reduces the book value of equipment — total assets decrease.`)],
+   mis:{L:'Depreciation does not create a debt. It reduces the book value of the equipment (an asset).', LOSS:'Depreciation is a normal cost of using equipment to earn revenue, so it is an expense.'}}
+  ];
+  // sort chronologically (Feb 1 insurance placed after Jan items)
+  const mo = {Jan:1,Feb:2,Mar:3,Apr:4,May:5,Jun:6,Jul:7,Aug:8,Sep:9,Oct:10,Nov:11,Dec:12};
+  T.forEach((x,i)=>{x.idx=i;});
+  T.sort((a,b)=>{const [ma,da]=a.d.split(' '),[mb,db]=b.d.split(' ');return (mo[ma]-mo[mb])||(da-db)||(a.idx-b.idx);});
+  return T;
+}
+
+function eqDelta(rows){
+  let A=0,L=0,E=0;
+  rows.forEach(r=>{
+    const s = r.dir==='+'?1:-1, v=s*r.amt;
+    if(r.el==='A') A+=v; else if(r.el==='L') L+=v;
+    else if(['PIC','REV','GAIN'].includes(r.el)) E+=v;
+    else if(['EXP','LOSS','DIV'].includes(r.el)) E-=v;
+  });
+  return {A,L,E};
+}
+const sgn = v => (v>0?'+':v<0?'−':'') + $(Math.abs(v));
+function eqHTML(rows,label){
+  const d = eqDelta(rows), ok = d.A===d.L+d.E;
+  return `<div class="eqcheck">${label?label+': ':''}<span>Assets <span class="g">${sgn(d.A)}</span></span><span>=</span><span>Liabilities <span class="g">${sgn(d.L)}</span></span><span>+</span><span>Equity <span class="g">${sgn(d.E)}</span></span><span class="badge ${ok?'ok':'no'}">${ok?'Balanced ✓':'Not balanced ✗'}</span></div>`;
+}
+const dirWord = d => d==='+'?'increase':'decrease';
+const arrow = d => d==='+'?'<span class="up">▲ Increase</span>':'<span class="down">▼ Decrease</span>';
+
+/* state */
+const st = {seed:0, list:[], order:[], i:0, mode:'see', attempted:{}, firstRight:0, firstDone:0};
+const seedIn = document.getElementById('seedIn');
+
+function loadSeed(seed){
+  st.seed = seed; seedIn.value = seed;
+  st.list = buildTx(mulberry32(seed));
+  st.order = document.getElementById('shuffle').checked ? shuffleArr(st.list.map((_,i)=>i), mulberry32(seed*7+3)) : st.list.map((_,i)=>i);
+  st.i=0; st.attempted={}; st.firstRight=0; st.firstDone=0;
+  try{ const u=new URL(location.href); u.searchParams.set('seed',seed); history.replaceState(null,'',u); }catch(e){}
+  renderTx();
+}
+function cur(){return st.list[st.order[st.i]];}
+
+function renderTx(){
+  const tx = cur();
+  document.getElementById('txNum').textContent = `Transaction ${st.i+1} of ${st.list.length}`;
+  document.getElementById('txDate').textContent = `${tx.d}, ${YEAR}`;
+  document.getElementById('txText').textContent = tx.t;
+  document.getElementById('txProg').style.width = ((st.i+1)/st.list.length*100)+'%';
+  document.getElementById('prev').disabled = st.i===0;
+  document.getElementById('next').disabled = st.i===st.list.length-1;
+  document.getElementById('seeAns').innerHTML='';
+  document.getElementById('reveal').hidden=false;
+  document.getElementById('seeArea').hidden = st.mode!=='see';
+  document.getElementById('tryArea').hidden = st.mode!=='try';
+  buildRows(tx);
+  const fb = document.getElementById('txFb'); fb.className='fb'; fb.innerHTML='';
+  document.getElementById('txScore').textContent = `First-try correct: ${st.firstRight} / ${st.firstDone}`;
+}
+
+function answerTable(tx){
+  return `<table class="fx"><thead><tr><th>Element</th><th>Effect</th><th>Amount</th><th>Why</th></tr></thead><tbody>${
+    tx.e.map(r=>`<tr><td><b>${N(r.el)}</b></td><td>${arrow(r.dir)}</td><td>${$(r.amt)}</td><td>${r.why}</td></tr>`).join('')
+  }</tbody></table>${eqHTML(tx.e,'Effect on the equation')}`;
+}
+document.getElementById('reveal').addEventListener('click',()=>{
+  document.getElementById('seeAns').innerHTML = answerTable(cur());
+  document.getElementById('reveal').hidden=true;
+});
+
+function amountOptions(tx){
+  const s = new Set(tx.e.map(r=>r.amt));
+  // add plausible distractors drawn from the transaction's own numbers
+  const base=[...s];
+  if(base.length>1){ for(let i=0;i<base.length;i++) for(let j=i+1;j<base.length;j++) s.add(base[i]+base[j]); }
+  const nums = (tx.t.match(/\$[\d,]+/g)||[]).map(x=>+x.replace(/[$,]/g,''));
+  nums.forEach(v=>s.add(v));
+  return [...s].filter(v=>v>0).sort((a,b)=>a-b);
+}
+function buildRows(tx){
+  const wrap = document.getElementById('ansRows'); wrap.innerHTML='';
+  const amts = amountOptions(tx);
+  for(let i=0;i<3;i++){
+    const r = document.createElement('div'); r.className='ansrow'; r.dataset.i=i;
+    r.innerHTML = `<span class="n">${i+1}</span>
+      <select class="elsel" aria-label="Line ${i+1} element"><option value="">— none —</option>${TX_OPTS.map(k=>`<option value="${k}">${N(k)}</option>`).join('')}</select>
+      <select class="dirsel" aria-label="Line ${i+1} effect"><option value="">— effect —</option><option value="+">Increase</option><option value="-">Decrease</option></select>
+      <select class="amtsel" aria-label="Line ${i+1} amount"><option value="">— amount —</option>${amts.map(v=>`<option value="${v}">${$(v)}</option>`).join('')}</select>
+      <span class="mark" aria-hidden="true"></span>`;
+    r.querySelectorAll('select').forEach(s=>s.addEventListener('change',()=>{r.classList.remove('okr','badr');r.querySelector('.mark').textContent='';}));
+    wrap.appendChild(r);
+  }
+}
+function readRows(){
+  return [...document.querySelectorAll('#ansRows .ansrow')].map(r=>({
+    i:+r.dataset.i, el:r.querySelector('.elsel').value, dir:r.querySelector('.dirsel').value,
+    amt:r.querySelector('.amtsel').value?+r.querySelector('.amtsel').value:null, node:r
+  }));
+}
+
+function grade(tx, rows){
+  const corr = tx.e.map(c=>({...c,used:false}));
+  const stud = rows.map(s=>({...s,used:false,ok:false,msg:''}));
+  const take=(s,c)=>{s.used=true;c.used=true;};
+  // 1. exact matches
+  stud.forEach(s=>{const c=corr.find(c=>!c.used&&c.el===s.el&&c.dir===s.dir&&c.amt===s.amt); if(c){take(s,c);s.ok=true;s.msg=c.why;}});
+  // 2. right element & direction, wrong amount
+  stud.forEach(s=>{if(s.used)return;const c=corr.find(c=>!c.used&&c.el===s.el&&c.dir===s.dir); if(c){take(s,c);
+    s.msg=`Right element and direction, but the amount should be <b>${$(c.amt)}</b>, not ${$(s.amt)}. ${c.why}`;}});
+  // 3. right element, wrong direction
+  stud.forEach(s=>{if(s.used)return;const c=corr.find(c=>!c.used&&c.el===s.el); if(c){take(s,c);
+    s.msg=`${N(c.el)} should <b>${dirWord(c.dir)}</b>, not ${dirWord(s.dir)}. ${c.why}${c.amt!==s.amt?` (Amount: ${$(c.amt)}.)`:''}`;}});
+  // 4. wrong element — pair with a remaining correct line (prefer same direction)
+  stud.forEach(s=>{if(s.used)return;
+    const c = corr.find(c=>!c.used&&c.dir===s.dir) || corr.find(c=>!c.used);
+    const hint = (tx.mis&&tx.mis[s.el]) || `${N(s.el)} is not affected by this transaction. (${N(s.el)}: ${EL[s.el].def})`;
+    if(c){take(s,c); s.msg=`${hint} This line should be <b>${N(c.el)} — ${dirWord(c.dir)} ${$(c.amt)}</b>: ${c.why}`;}
+    else { s.used=true; s.msg=`${hint} This transaction does not need this line.`; }
+  });
+  const missing = corr.filter(c=>!c.used);
+  return {stud, missing, allOk: stud.every(s=>s.ok) && missing.length===0};
+}
+
+document.getElementById('txCheck').addEventListener('click',()=>{
+  const tx = cur(), fb = document.getElementById('txFb');
+  const all = readRows();
+  const used = all.filter(r=>r.el||r.dir||r.amt!==null);
+  all.forEach(r=>{r.node.classList.remove('okr','badr');r.node.querySelector('.mark').textContent='';});
+  if(!used.length){fb.className='fb show info';fb.innerHTML='<h4>Fill in at least one line first.</h4>';return;}
+  const incomplete = used.filter(r=>!r.el||!r.dir||r.amt===null);
+  if(incomplete.length){fb.className='fb show info';fb.innerHTML=`<h4>Complete line ${incomplete.map(r=>r.i+1).join(', ')}.</h4><p>Each line you use needs an element, an effect, and an amount.</p>`;return;}
+  const g = grade(tx, used);
+  g.stud.forEach(s=>{s.node.classList.add(s.ok?'okr':'badr'); const m=s.node.querySelector('.mark'); m.textContent=s.ok?'✓':'✗'; m.style.color=s.ok?'var(--ok)':'var(--bad)';});
+  const key = st.order[st.i];
+  if(!(key in st.attempted)){ st.attempted[key]=g.allOk; st.firstDone++; if(g.allOk) st.firstRight++; }
+  document.getElementById('txScore').textContent = `First-try correct: ${st.firstRight} / ${st.firstDone}`;
+  let html;
+  if(g.allOk){
+    html = `<h4>Correct!</h4><ul>${g.stud.map(s=>`<li><b>${N(s.el)} ${dirWord(s.dir)} ${$(s.amt)}</b> — ${s.msg}</li>`).join('')}</ul>`;
+  } else {
+    const items = g.stud.map(s=> s.ok
+      ? `<li>✓ Line ${s.i+1} is correct.</li>`
+      : `<li>✗ <b>Line ${s.i+1}</b> (${N(s.el)}, ${dirWord(s.dir)}, ${$(s.amt)}): ${s.msg}</li>`);
+    g.missing.forEach(c=>items.push(`<li>✗ <b>Missing line:</b> ${N(c.el)} should ${dirWord(c.dir)} by ${$(c.amt)}. ${c.why}</li>`));
+    html = `<h4>Not quite — review the feedback below</h4><ul>${items.join('')}</ul>`;
+  }
+  html += eqHTML(used, g.allOk?'Equation check':'Your answer');
+  if(!g.allOk){
+    const d = eqDelta(used), bal = d.A===d.L+d.E;
+    html += `<p class="note" style="margin-top:8px">${bal ? 'Your answer balances, but a balanced equation alone does not mean the elements are right.' : 'Every transaction keeps Assets = Liabilities + Equity in balance — yours does not, which is a clue something is off.'} Fix your lines and check again, or click “Show answer.”</p>`;
+  }
+  fb.className = 'fb show ' + (g.allOk?'ok':'bad');
+  fb.innerHTML = html;
+});
+document.getElementById('txShow').addEventListener('click',()=>{
+  const tx=cur(), fb=document.getElementById('txFb');
+  const key = st.order[st.i];
+  if(!(key in st.attempted)){ st.attempted[key]=false; st.firstDone++; document.getElementById('txScore').textContent = `First-try correct: ${st.firstRight} / ${st.firstDone}`; }
+  fb.className='fb show info'; fb.innerHTML = `<h4>Answer</h4>${answerTable(tx)}`;
+});
+document.getElementById('txClear').addEventListener('click',()=>{buildRows(cur()); const fb=document.getElementById('txFb'); fb.className='fb'; fb.innerHTML='';});
+document.getElementById('prev').addEventListener('click',()=>{if(st.i>0){st.i--;renderTx();}});
+document.getElementById('next').addEventListener('click',()=>{if(st.i<st.list.length-1){st.i++;renderTx();}});
+function setMode(m){
+  st.mode=m;
+  document.getElementById('mSee').setAttribute('aria-pressed', m==='see');
+  document.getElementById('mTry').setAttribute('aria-pressed', m==='try');
+  renderTx();
+}
+document.getElementById('mSee').addEventListener('click',()=>setMode('see'));
+document.getElementById('mTry').addEventListener('click',()=>setMode('try'));
+document.getElementById('seedGo').addEventListener('click',()=>{const v=parseInt(seedIn.value,10); if(v>0&&v<100000) loadSeed(v);});
+seedIn.addEventListener('keydown',e=>{if(e.key==='Enter') document.getElementById('seedGo').click();});
+document.getElementById('seedNew').addEventListener('click',()=>loadSeed(1+Math.floor(Math.random()*99999)));
+document.getElementById('shuffle').addEventListener('change',()=>loadSeed(st.seed));
+
+document.getElementById('cheatList').innerHTML = TX_OPTS.map(k=>`<dt>${N(k)}</dt><dd>${EL[k].def}</dd>`).join('');
+
+let initSeed = 1+Math.floor(Math.random()*99999);
+try{ const p=parseInt(new URLSearchParams(location.search).get('seed'),10); if(p>0&&p<100000) initSeed=p; }catch(e){}
+loadSeed(initSeed);
+
+// expose for testing
+window.__EOA = {buildTx, mulberry32, grade, eqDelta};
+})();
+</script>
+</body>
+</html>
