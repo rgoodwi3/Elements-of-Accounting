@@ -781,7 +781,12 @@ function eqDelta(rows){
 const dirWord=d=>d==="+"?"increase":"decrease";
 const arrow=d=>d==="+"?'<span class="up">▲ Increase</span>':'<span class="down">▼ Decrease</span>';
 
-function grade(tx,rows){
+function grade(tx,rows0){
+  // Lines with the same element and direction count as one line for their total (Cash +2,750 and
+  // Accounts Receivable +1,000 is Assets +3,750), unless the answer itself has two such lines.
+  const key=r=>r.el+"|"+r.dir, ck={};tx.e.forEach(c=>{ck[key(c)]=(ck[key(c)]||0)+1;});
+  const rows=[],grp={};
+  rows0.forEach(r=>{const k=key(r);if(ck[k]===1&&grp[k]){grp[k].amt+=r.amt;grp[k].also.push(r.i);}else{const m={...r,also:[]};rows.push(m);if(ck[k]===1)grp[k]=m;}});
   const corr=tx.e.map(c=>({...c,used:false}));
   const stud=rows.map(s=>({...s,used:false,ok:false,msg:""}));
   const take=(s,c)=>{s.used=true;c.used=true;};
@@ -797,7 +802,9 @@ function grade(tx,rows){
     else{s.used=true;s.msg=hint+" This transaction does not need this line.";}
   });
   const missing=corr.filter(c=>!c.used);
-  return{stud,missing,allOk:stud.every(s=>s.ok)&&missing.length===0};
+  const allOk=stud.every(s=>s.ok)&&missing.length===0;
+  stud.slice().forEach(s=>s.also.forEach(i=>stud.push({...s,i,also:[],copy:true})));
+  return{stud,missing,allOk};
 }
 function amountOptions(tx){
   const s=new Set(tx.e.map(r=>r.amt)), base=[...s];
@@ -1074,7 +1081,7 @@ async function submitGraded(){
     if(r.solution&&r.solution.e)TX[i].e=r.solution.e;
     if(F.fb&&F.fb.allOk){if(!r.solution){TX[i].e=ownEffects(answer.vals);ownSave(i,answer);}status[i]=GS.pts[i]===1?"first":"retry";}
     const p=GS.pts[i]||0;
-    if(F.fb&&"allOk" in F.fb)F.fb.msg='<div style="margin-bottom:6px"><b>Graded:</b> your first submission earned '+p+' of 1 point.'+(F.fb.allOk&&p===1?"":" Retries don't change your score.")+'</div>'+F.fb.msg.replace(" or click Show the answer","");
+    if(F.fb&&"allOk" in F.fb)F.fb.msg='<div style="margin-bottom:6px"><b>Graded:</b> your first submission earned '+p+' of 1 point.'+(F.fb.allOk&&p===1?"":" Retries don't change your score.")+'</div>'+F.fb.msg.replace(/,? or click Show the answer/,"");
     BUSY=false; render();
   }catch(e){BUSY=false;F.fb={lines:{},cls:"no",msg:esc(e.message)};renderEntry();onApiError(e);}
   finally{BUSY=false;}
@@ -1205,7 +1212,7 @@ function checkTx(){
   g.stud.forEach(s=>{lines[s.i]={ok:s.ok,msg:s.ok?"":s.msg};});
   let msg;
   if(g.allOk){
-    msg='<b>✓ Correct.</b><ul>'+g.stud.map(s=>'<li>'+esc(N(s.el))+' '+dirWord(s.dir)+' '+d$(s.amt)+': '+esc(s.msg)+'</li>').join("")+'</ul>';
+    msg='<b>✓ Correct.</b><ul>'+g.stud.filter(s=>!s.copy).map(s=>'<li>'+esc(N(s.el))+' '+dirWord(s.dir)+' '+d$(s.amt)+': '+esc(s.msg)+'</li>').join("")+'</ul>';
     status[k]=F.tries===1?"first":"retry";
   } else {
     const items=g.missing.map(c=>'<li><b>Missing line:</b> '+esc(N(c.el))+' should '+dirWord(c.dir)+' by '+d$(c.amt)+'.</li>');
