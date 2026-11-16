@@ -828,10 +828,19 @@ function amountOptions(tx){
 
 /* ---------- state ---------- */
 let seed=0,TX=[],NT=0,part="learn",mode="try",k=0,status=[],F=null,confirmReset=false,done=false;
-function buildSet(sd){seed=sd;TX=buildTx(mulberry32(sd));NT=TX.length;markDfy();setChip();}
-function startForm(){F={rows:[0,1,2].map(()=>({el:"",dir:"",amt:""})),fb:null,tries:0,revealed:false};confirmReset=false;}
+function buildSet(sd){WORK=[];seed=sd;TX=buildTx(mulberry32(sd));NT=TX.length;markDfy();setChip();}
+function startForm0(){F={rows:[0,1,2].map(()=>({el:"",dir:"",amt:""})),fb:null,tries:0,revealed:false};confirmReset=false;}
+// Practice keeps each step's work (what was entered, checked or shown) so moving between steps, reloading
+// or leaving the page doesn't lose it. WORK[i] is step i's form; it's saved with the practice set.
+let WORK=[];
+function workIn(w){return Array.isArray(w)?w.map(x=>x&&typeof x==="object"&&Array.isArray(x.rows)?Object.assign({vals:{}},x,{warn:null}):null):[];}
+function startForm(){if(MODE!=="graded"&&WORK[k]){F=WORK[k];F.warn=null;confirmReset=false;return;}startForm0();if(MODE!=="graded")WORK[k]=F;}
+// Save practice work as it's typed, and when the page is left.
+document.addEventListener("input",()=>{if(MODE!=="graded")setTimeout(save,0);});
+document.addEventListener("change",()=>{if(MODE!=="graded")setTimeout(save,0);});
+window.addEventListener("pagehide",()=>{save();});
 function fresh(){k=0;done=false;status=new Array(NT).fill(null);startForm();}
-function save(){try{if(!PENDING)localStorage.setItem(MKEY,MODE);if(MODE==="graded"&&GS){localStorage.setItem(GKEY,JSON.stringify({attempt:GS.id,course:GS.course}));return;}localStorage.setItem(KEY,JSON.stringify({seed,part,mode,k,done,status,el:curEl,year:YEAR}));}catch(e){}}
+function save(){try{if(!PENDING)localStorage.setItem(MKEY,MODE);if(MODE==="graded"&&GS){localStorage.setItem(GKEY,JSON.stringify({attempt:GS.id,course:GS.course}));return;}localStorage.setItem(KEY,JSON.stringify({seed,part,mode,k,done,status,el:curEl,year:YEAR,work:WORK}));}catch(e){}}
 function load(){
   let m=null, ptr=null, hs=null;
   try{ptr=JSON.parse(localStorage.getItem(GKEY)||"null"); m=localStorage.getItem(MKEY);}catch(e){ptr=null;}
@@ -847,7 +856,7 @@ function loadPractice(){
   try{const m=/^#set(\d{1,9})$/.exec(location.hash||"");if(m)hs=+m[1];
       const p=parseInt(new URLSearchParams(location.search).get("seed"),10);if(!hs&&p>0)hs=p;}catch(e){}
   if(hs&&(!st||st.seed!==hs)){buildSet(hs);fresh();if(st&&st.part)part=st.part;return;}
-  if(st&&st.seed){try{buildSet(st.seed);fresh();
+  if(st&&st.seed){try{buildSet(st.seed);fresh();WORK=workIn(st.work);
     part=["learn","quiz","tx"].includes(st.part)?st.part:"learn"; mode=st.mode==="see"?"see":"try";
     k=Math.max(0,Math.min(NT-1,st.k|0)); done=!!st.done;
     if(Array.isArray(st.status)&&st.status.length===NT)status=st.status;
