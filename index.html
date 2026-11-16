@@ -362,11 +362,17 @@ table.ptab{width:100%;border-collapse:collapse;margin-top:8px}
 .pledge input{width:18px;height:18px;margin:2px 0 0;flex:none;accent-color:var(--navy)}
 .pledge:has(input:checked){border-color:var(--good);background:var(--good-soft)}
 .gk-hidden{font-size:13.5px;color:var(--muted);font-style:italic}
+/* A transaction outside the concepts the instructor assigned: filled in for the student, not scored */
+.dfy-note{margin:0 0 10px;font-size:14px;border-radius:8px;padding:9px 12px;border:1px dashed var(--rule-strong);background:var(--paper);color:var(--ink)}
+.tick.dfy{border-style:dashed}
+.ticks .tick.dfy.done{background:var(--paper);border-color:var(--muted);color:var(--muted)}
 </style>
 <!-- Graded mode only: sign-in and server grading. Practice mode works without it. -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.49.4/dist/umd/supabase.js" integrity="sha384-rwykjmWNwVxboyFmvK9OXN0wj9hnMHA2aAHtits54DuACyCq0M2PrSNxhRb+hvXT" crossorigin="anonymous" defer></script>
 <!-- Activity signals for graded attempts (typing, pasting, time away, automation); see interacctive/integrity.js -->
 <script src="/interacctive/integrity.js"></script>
+<!-- The concepts in each lab, for assignments that include only some (see fa-lab-platform topics.js) -->
+<script src="/interacctive/topics.js"></script>
 <!-- School name and colors from the class instructor's InterACCtive branding; default is University of New Haven -->
 <script src="/interacctive/brand.js"></script>
 </head>
@@ -822,7 +828,7 @@ function amountOptions(tx){
 
 /* ---------- state ---------- */
 let seed=0,TX=[],NT=0,part="learn",mode="try",k=0,status=[],F=null,confirmReset=false,done=false;
-function buildSet(sd){seed=sd;TX=buildTx(mulberry32(sd));NT=TX.length;setChip();}
+function buildSet(sd){seed=sd;TX=buildTx(mulberry32(sd));NT=TX.length;markDfy();setChip();}
 function startForm(){F={rows:[0,1,2].map(()=>({el:"",dir:"",amt:""})),fb:null,tries:0,revealed:false};confirmReset=false;}
 function fresh(){k=0;done=false;status=new Array(NT).fill(null);startForm();}
 function save(){try{if(!PENDING)localStorage.setItem(MKEY,MODE);if(MODE==="graded"&&GS){localStorage.setItem(GKEY,JSON.stringify({attempt:GS.id,course:GS.course}));return;}localStorage.setItem(KEY,JSON.stringify({seed,part,mode,k,done,status,el:curEl,year:YEAR}));}catch(e){}}
@@ -1069,11 +1075,13 @@ function applyProblem(pr){
   status=new Array(NT).fill(null);
   const ownSaved=ownLoad();
   Object.keys(pr.progress||{}).forEach(key=>{const i=+key, r=pr.progress[key]; if(!TX[i])return;
+    if(r.doneForYou){dfyGraded(i,r);return;}
     GS.done[i]=true; GS.pts[i]=r.points; GS.ans[i]=r.answer; GS.fb[i]=r.feedback; status[i]=r.points===1?"first":"retry";
     if(r.solution&&r.solution.e)TX[i].e=r.solution.e;
     else{const a=r.points===1?r.answer:ownSaved[i]; if(a&&a.vals)TX[i].e=ownEffects(a.vals);}});
   const nx=pr.next_step|0;
   done=!!GS.finishedAt||nx>=NT; k=Math.max(0,Math.min(NT-1,nx));
+  if(!done)while(k>0&&TX[k-1].doneForYou&&GS.done[k-1])k--;
   setChip(); startForm();
 }
 async function submitGraded(){
@@ -1090,6 +1098,8 @@ async function submitGraded(){
     if(r.first&&GS.ans[i]===undefined){GS.ans[i]=answer;GS.fb[i]=JSON.parse(JSON.stringify(r.feedback));} // the scored submission, for looking back
     F.tries++; F.fb=r.feedback; GS.done[i]=true; GS.pts[i]=r.points;
     if(r.next&&TX[i+1]&&TX[i+1].locked)TX[i+1]=r.next;
+    (r.doneForYou||[]).forEach(g=>dfyGraded(g.step,g));
+    if(r.after&&TX[r.after.step]&&TX[r.after.step].locked)TX[r.after.step]=r.after.public;
     if(r.solution&&r.solution.e)TX[i].e=r.solution.e;
     if(F.fb&&F.fb.allOk){if(!r.solution){TX[i].e=ownEffects(answer.vals);ownSave(i,answer);}status[i]=GS.pts[i]===1?"first":"retry";}
     const p=GS.pts[i]||0;
@@ -1106,7 +1116,7 @@ function newSet(same){buildSet(same?seed:randomSeed());fresh();try{history.repla
 function renderBar(){
   const tk=(id,lab,cls)=>graded()?'':'<button class="tick wide'+(cls||"")+'" data-part="'+id+'">'+lab+'</button>';
   let h='<div class="phase ph-h"><div class="phase-label">Elements</div><div class="ticks">'+tk("learn","Learn",part==="learn"?" cur":"")+tk("quiz","Quiz",part==="quiz"?" cur":"")+'</div></div>';
-  const ticks=adj=>TX.map((t,i)=>(!!t.adj===adj)?'<button class="tick'+(status[i]?" done s-"+status[i]:"")+((graded()&&VIEW!=null?i===VIEW:part==="tx"&&i===k&&!done)?" cur":"")+(rvCan(i)?" can":"")+'" data-i="'+i+'"'+(graded()?' aria-disabled="'+!rvCan(i)+'"':'')+((graded()&&VIEW!=null?i===VIEW:part==="tx"&&i===k&&!done)?' aria-current="step"':'')+' aria-label="'+(adj?"Adjustment ":"Transaction ")+t.ref+'">'+t.ref+'</button>':"").join("");
+  const ticks=adj=>TX.map((t,i)=>(!!t.adj===adj)?'<button class="tick'+(t.doneForYou?" dfy":"")+(status[i]?" done s-"+status[i]:"")+((graded()&&VIEW!=null?i===VIEW:part==="tx"&&i===k&&!done)?" cur":"")+(rvCan(i)?" can":"")+'" data-i="'+i+'"'+(graded()?' aria-disabled="'+!rvCan(i)+'"':'')+((graded()&&VIEW!=null?i===VIEW:part==="tx"&&i===k&&!done)?' aria-current="step"':'')+' aria-label="'+(adj?"Adjustment ":"Transaction ")+t.ref+'">'+t.ref+'</button>':"").join("");
   h+='<div class="phase ph-h"><div class="phase-label">Transactions</div><div class="ticks">'+ticks(false)+'</div></div>';
   h+='<div class="phase ph-est"><div class="phase-label">Dec 31, '+YEAR+'</div><div class="ticks">'+ticks(true)+'</div></div>';
   $("timeline").innerHTML=h;
@@ -1135,6 +1145,16 @@ function rvGo(i){
   const c=$("entry").querySelector(VIEW!=null?'[data-act="rvBack"]':'[data-act="next"],[data-act="finishG"],select:not([disabled])');if(c)c.focus({preventScroll:true});
 }
 function rvRender(i){
+  if(TX[i]&&TX[i].doneForYou){
+    let prev=-1,next=-1;
+    for(let j=i-1;j>=0;j--)if(GS.done[j]&&!rvIsCur(j)){prev=j;break;}
+    for(let j=i+1;j<NT;j++)if(GS.done[j]&&!rvIsCur(j)){next=j;break;}
+    const back=done?(GS.finishedAt?"Back to your score":"Back to finishing"):"Back to step "+(k+1);
+    $("entryH").textContent="Looking back"; $("entrySub").textContent="Done for you";
+    $("entry").innerHTML=dfyBody(i)+'<div class="actions"><div class="grp">'+(prev>=0?'<button class="btn small" data-act="rvGo" data-i="'+prev+'">← '+esc(TX[prev].ref)+'</button>':'')+(next>=0?'<button class="btn small" data-act="rvGo" data-i="'+next+'">'+esc(TX[next].ref)+' →</button>':'')+'</div>'+
+      '<div class="grp"><button class="btn primary" data-act="rvBack">'+back+' →</button></div></div>';
+    return;
+  }
   const t=TX[i], a=GS.ans[i], fb=GS.fb[i]||{}, p=GS.pts[i]||0, mx=GS.max&&GS.max[i]!=null?GS.max[i]:1, v=a&&a.vals||{};
   $("entryH").textContent="Looking back"; $("entrySub").textContent="View only";
   let h='<div class="rv-note"><b>View only.</b> You already submitted this transaction, so it can\'t be changed. Your first submission earned '+p+' of '+mx+(mx===1?" point":" points")+'.</div>'+
@@ -1158,6 +1178,42 @@ function rvRender(i){
   h+='<div class="actions"><div class="grp">'+(prev>=0?'<button class="btn small" data-act="rvGo" data-i="'+prev+'">← '+esc(TX[prev].ref)+'</button>':'')+(next>=0?'<button class="btn small" data-act="rvGo" data-i="'+next+'">'+esc(TX[next].ref)+' →</button>':'')+'</div>'+
     '<div class="grp"><button class="btn primary" data-act="rvBack">'+back+' →</button></div></div>';
   $("entry").innerHTML=h;
+}
+
+/* ---------- done for you: transactions outside the concepts the instructor assigned ---------- */
+// Graded attempts mark them on the server (doneForYou, with the effects). Practice opened from the class page
+// follows the same concepts (window.IAC_TOPICS, /interacctive/topics.js). The transaction shows with its
+// effects filled in, nothing to enter, worth no points, and the equation stays complete.
+let PTOPICS=null;
+const DFY_NOTE='<div class="dfy-note"><b>Done for you.</b> Your instructor didn\'t include this transaction in the assignment, so its effects are filled in. Read them, then go on. It isn\'t scored.</div>';
+function dfyTx(i){const t=TX[i];return !!(t&&t.doneForYou&&(!graded()||(GS&&GS.done[i])));}
+function markDfy(){
+  const T=window.IAC_TOPICS;
+  TX.forEach((t,i)=>{const g=!!(T&&PTOPICS&&T.isGiven(LAB_SLUG,t,PTOPICS));t.doneForYou=g;if(!g&&Array.isArray(status)&&status[i]==="given")status[i]=null;});
+}
+function dfyGraded(i,r){
+  if(r.public&&(!TX[i]||TX[i].locked))TX[i]=r.public;
+  const t=TX[i]; if(!t)return;
+  t.doneForYou=true; GS.done[i]=true; GS.pts[i]=0; GS.ans[i]=r.answer; GS.fb[i]=r.feedback; status[i]="given";
+  if(r.solution&&r.solution.e)t.e=r.solution.e;
+}
+function dfyBody(i){
+  const t=TX[i];
+  return DFY_NOTE+'<div class="entry-meta"><span class="pill '+(t.adj?"est":"h")+'">'+(t.adj?"Adjustment ":"Transaction ")+esc(t.ref)+'</span><span>'+t.d+', '+YEAR+'</span><span>· '+esc(t.kind)+'</span><span>· Step '+(i+1)+' of '+NT+'</span></div>'+
+    '<p class="entry-desc" style="font-size:17px;font-weight:600;margin-top:10px">'+esc(t.t)+'</p>'+(t.e&&t.e.length?answerTable(t):'');
+}
+// Practice opened from the class page follows the concepts the instructor assigned (signed-in students only;
+// otherwise, or if anything fails, practice is the whole lab).
+async function loadTopics(){
+  if(!COURSE||!window.IAC_TOPICS)return;
+  try{
+    if(!(await currentUser()))return;
+    const r=await sb().from("course_activities").select("topics, activities!inner(slug)").eq("course_id",COURSE).eq("activities.slug",LAB_SLUG).maybeSingle();
+    const t=r&&r.data?window.IAC_TOPICS.cleanTopics(LAB_SLUG,r.data.topics):null;
+    if(JSON.stringify(t)===JSON.stringify(PTOPICS))return;
+    PTOPICS=t;
+    if(!graded()){markDfy();render();}
+  }catch(e){}
 }
 
 /* ---------- Part 3 rendering ---------- */
@@ -1188,6 +1244,7 @@ function renderEntry(){
   if(graded()&&VIEW!=null){rvRender(VIEW);return;}
   if(done&&graded()){renderGradedDone();return;}
   if(done){renderDone();return;}
+  if(dfyTx(k)){status[k]="given";$("entryH").textContent="Done for you";$("entrySub").textContent="Not part of this assignment";$("entry").innerHTML=dfyBody(k)+controls(nextBtn());return;}
   const t=curTx();
   $("entryH").textContent="Transaction effects";
   $("entrySub").textContent=mode==="see"?"See the answers":"Try it myself";
@@ -1286,7 +1343,7 @@ $("entry").addEventListener("click",e=>{
   if(graded()&&BUSY)return;
   if(graded()&&a==="check"){submitGraded();return;}
   if(graded()&&a==="finishG"){finishGraded();return;}
-  if(graded()&&a==="next"&&!(F.fb&&F.fb.allOk))return;
+  if(graded()&&a==="next"&&!(F.fb&&F.fb.allOk)&&!dfyTx(k))return;
   if(a==="check")checkTx();
   else if(a==="show"){F.revealed=true;if(!status[k])status[k]="shown";render();}
   else if(a==="reveal"){F.revealed=true;if(!status[k])status[k]="shown";render();}
@@ -1321,6 +1378,7 @@ buildQuiz(); load(); startForm(); render(); measure();
 // or reopen the Graded dialog after the student follows the sign-in link from their email.
 (function(){
   const go=async()=>{
+    loadTopics();
     const fromEmail=/(^#|&)(access_token|error_description)=/.test(location.hash);
     if(PENDING){
       const id=PENDING;
